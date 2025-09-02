@@ -304,4 +304,5 @@ Para começar, digite seu nome abaixo:
   }
 });
 
+require('./server');
 
