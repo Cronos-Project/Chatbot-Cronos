@@ -1,7 +1,6 @@
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const schedule = require('node-schedule');
-const { enviarWhatsapp } = require('./whatsapp');
 const conectarMongo = require('./db');
 const Agendamento = require('./models/Agendamento');
 const moment = require('moment');
@@ -246,8 +245,6 @@ Para começar, digite seu nome abaixo:
           horario: state.time,
           valor: state.price
         });
-
-        await enviarWhatsapp(state.phone, `Olá ${state.name}, seu agendamento para ${state.service} com ${state.barber.nome} (R$ ${state.price}) está confirmado para ${state.date} às ${state.time} 💈`);
 
         const [dia, mes, ano] = state.date.split('/');
         const [hora, minuto] = state.time.split(':');
