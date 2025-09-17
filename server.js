@@ -12,8 +12,8 @@
 
 const express = require('express');
 const cors = require('cors');
-const conectarMongo = require('/db');
-const Agendamento = require('/models/Agendamento');
+const conectarMongo = require('./db');
+const Agendamento = require('./models/Agendamento');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
