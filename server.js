@@ -39,6 +39,28 @@ app.post('/agendamentos', async (req, res) => {
   }
 });
 
+// Cancelar agendamento
+app.post('/agendamentos/cancelar', async (req, res) => {
+  try {
+    const { nome, data, horario } = req.body;
+
+    if (!nome || !data || !horario) {
+      return res.status(400).json({ error: 'Nome, data e horário são obrigatórios' });
+    }
+
+    const agendamento = await Agendamento.findOneAndDelete({ nome, data, horario });
+
+    if (!agendamento) {
+      return res.status(404).json({ error: 'Agendamento não encontrado' });
+    }
+
+    res.json({ message: 'Agendamento cancelado com sucesso', agendamento });
+  } catch (err) {
+    console.error('Erro ao cancelar agendamento:', err);
+    res.status(500).json({ error: 'Erro ao cancelar agendamento' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor Express ativo na porta ${PORT}`);
 });
