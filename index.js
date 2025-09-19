@@ -73,6 +73,27 @@ const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
 
 (async () => {
   await conectarMongo();
+
+   // 🔄 Limpeza automática de agendamentos antigos (executa todo dia à meia-noite)
+  schedule.scheduleJob('0 0 * * *', async () => {
+    const hoje = moment().startOf('day');
+    try {
+      const resultado = await Agendamento.deleteMany({
+        $or: [
+          { data: { $lt: hoje.format('DD/MM/YYYY') } },
+          {
+            $and: [
+              { data: hoje.format('DD/MM/YYYY') },
+              { horario: { $lt: moment().format('HH:mm') } }
+            ]
+          }
+        ]
+      });
+      console.log(`🧹 Limpeza concluída. Agendamentos removidos: ${resultado.deletedCount}`);
+    } catch (err) {
+      console.error('Erro na limpeza automática:', err);
+    }
+  });
 })();
 
 // ------------------------- Comandos -------------------------
