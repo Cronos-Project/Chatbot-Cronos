@@ -76,20 +76,24 @@ const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
 
    // 🔄 Limpeza automática de agendamentos antigos (executa todo dia à meia-noite)
   schedule.scheduleJob('0 0 * * *', async () => {
-    const hoje = moment().startOf('day');
+    const agora = moment(); // data e hora atual
+
     try {
-      const resultado = await Agendamento.deleteMany({
-        $or: [
-          { data: { $lt: hoje.format('DD/MM/YYYY') } },
-          {
-            $and: [
-              { data: hoje.format('DD/MM/YYYY') },
-              { horario: { $lt: moment().format('HH:mm') } }
-            ]
-          }
-        ]
-      });
-      console.log(`🧹 Limpeza concluída. Agendamentos removidos: ${resultado.deletedCount}`);
+      const agendamentos = await Agendamento.find();
+      let removidos = 0;
+
+      for (const ag of agendamentos) {
+        const [dia, mes, ano] = ag.data.split('/');
+        const [hora, minuto] = ag.horario.split(':');
+        const dataAg = new Date(Number(ano), Number(mes) - 1, Number(dia), Number(hora), Number(minuto));
+
+        if (dataAg < agora.toDate()) {
+          await Agendamento.deleteOne({ _id: ag._id });
+          removidos++;
+        }
+      }
+
+      console.log(`🧹 Limpeza concluída. Agendamentos removidos: ${removidos}`);
     } catch (err) {
       console.error('Erro na limpeza automática:', err);
     }
